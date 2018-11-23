@@ -24,13 +24,16 @@ pip install -r requirements.txt
 
 ## Usage
 
+First please add `Linkomanija.net` login credentials and `omdbapi.com` API key to the `config.py` file, otherwise script will not work as both sites are secured with logins.
+
 From your Terminal run `python3 main.py`
+
 In the Terminal you will get info:
 
-- Which movies was fetched
-- Which ones were saved into the DB
-- Movies will not duplicate and will be carefuly filtered
-- Which movie `.torrent` files were downloaded
+- Fetched movies
+- Movies saved to DB
+- Movies that were filtered out because they already existing in DB
+- Which `.torrent` files downloaded
 
 In the cloned project directory you will see newly created `/torrent/` folder, where downloaded torrent files will be saved and `movie.db` where fetched movie info will be saved. 
 
