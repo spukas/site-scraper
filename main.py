@@ -12,7 +12,7 @@ session.post(config.lm_url + config.lm_login, data=config.lm_credentials)
 response = session.get(config.lm_url + config.lm_search)
 soup = BeautifulSoup(response.text, 'html.parser')
 
-## Specify quantity of movies to fetch
+## Specify quantity of movies to fetch (from 1 to 50)
 html_rows = utils.get_rows(soup, 15)
 
 print('='*10, 'FETCHING MOVIE INFO', '='*10)
