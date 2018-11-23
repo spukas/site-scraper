@@ -1,10 +1,14 @@
 import sqlite3
+import requests
+import os
 from movie import Movie
+import config
 
-def get_rows(html):
+def get_rows(html, quantity):
   if html.find_all('table')[3]:
     table = html.find_all('table')[3]
-    return table.find_all('tr')[1:]
+    rows = table.find_all('tr')[1:]
+    return rows[:quantity]
   else:
     return False
 
@@ -16,7 +20,7 @@ def get_movie_info_list(rows):
     print(movie.title, 'info was fetched')
   return movie_info_list
 
-def save_in_database(movie):
+def save_in_database(movie, session):
   connection = sqlite3.connect('movies.db')
   cursor = connection.cursor()
   
@@ -26,11 +30,14 @@ def save_in_database(movie):
   cursor.execute('SELECT * FROM movies WHERE id=?', (movie.movie_id, ))
   row = cursor.fetchone()
   
+  # If movie not in DB then add and download torrent file
   if row == None:
     cursor.execute("INSERT INTO movies VALUES (?, ?, ?)", (movie.movie_id, movie.title, movie.rating))
-    print('Movie "' + movie.title + '" was inserted into DB')
+    print('Movie "' + movie.title + '" added')
+    url = config.lm_url + movie.torrent
+    save_torrent(url, session);
   else:
-    print('Movie "' + movie.title + '" already exist. No update made.')
+    print('Movie "' + movie.title + '" already exist')
     
   # Commit changes and close connection
   connection.commit()
@@ -43,3 +50,15 @@ def show_database_entries():
     for row in cursor.execute('SELECT * FROM movies'):
         print(row)
     connection.close()
+
+def save_torrent(url, session):
+    response = session.get(url)
+    save_location = os.getcwd() + '/torrents/'
+    filename = save_location + url.split('name=')[1]
+    # Creates new directory if the directory does not exist. Otherwise, just use the existing path.
+    if not os.path.isdir(save_location):
+        os.mkdir(save_location)
+    with open(filename, 'wb') as file:
+        file.write(response.content)
+        print('Torrent downloaded')
+    file.close()
